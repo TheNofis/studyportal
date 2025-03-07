@@ -21,6 +21,7 @@ export class CreateAssignmentDto {
   module: string;
 
   @IsArray()
+  @IsOptional()
   attachments: IAttachment[];
 
   @IsString({ each: true })

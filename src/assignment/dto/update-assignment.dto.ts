@@ -27,6 +27,7 @@ export class UpdateAssignmentDto extends PartialType(CreateAssignmentDto) {
   module?: string;
 
   @IsArray()
+  @IsOptional()
   attachments: IAttachment[];
 
   @IsString({ each: true })
