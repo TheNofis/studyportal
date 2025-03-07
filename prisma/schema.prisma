@@ -13,42 +13,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  admin
+  user
+}
+
 model User {
-  id String @id @default(cuid())
-  username String
-  password String
-  class String
-  role String
-  assignments Assignments_User[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String              @id @default(cuid())
+  username      String
+  password      String
+  class         String              @default("none")
+  role          Role                @default(user)
+  assignments   Assignments_User[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
 }
 
 model Assignment {
-  id String @id @default(cuid())
-  title String
-  description String
-  content String
-  attachments Json
-  module String
-  tags String
-  deadlineAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String              @id @default(cuid())
+  title         String
+  description   String
+  content       String
+  attachments   Json
+  module        String
+  tags          String
+  deadlineAt    DateTime
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
 
-  users Assignments_User[]
+  users         Assignments_User[]
 }
 
 model Assignments_User {
   assignmentsId String
-  assignment Assignment @relation(fields: [assignmentsId], references: [id])
+  assignment    Assignment          @relation(fields: [assignmentsId], references: [id])
 
-  userId String
-  user User @relation(fields: [userId], references: [id])
+  userId        String
+  user          User                @relation(fields: [userId], references: [id])
 
-  evaluation Int
-  status String
-  comment String
+  evaluation    Int
+  status        String
+  comment       String
   
   @@id([assignmentsId, userId])
 }

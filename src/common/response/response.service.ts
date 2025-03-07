@@ -15,7 +15,7 @@ export enum Status {
   Unknown = 'Unknown',
 }
 
-export default class ResponseModule {
+export default class ResponseService {
   constructor() {
     this.startTime = Date.now();
   }
