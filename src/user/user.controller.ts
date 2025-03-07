@@ -15,4 +15,10 @@ export class UserController {
   profile(@Session() session: ISession) {
     return this.userService.profile(session);
   }
+
+  @Get('last-actions')
+  @Roles(Role.USER)
+  lastAction(@Session() session: ISession) {
+    return this.userService.lastAction(session);
+  }
 }
