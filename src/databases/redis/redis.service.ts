@@ -1,22 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import { createClient } from 'redis';
+import { createClient, RedisClientType } from 'redis';
 
 export const DEFAULT_CACHE_TIME = 60 * 5;
 
 @Injectable()
 export class RedisService {
-  private redisClient: any;
+  private redisClient: RedisClientType;
 
-  constructor() {}
-
-  onModuleInit() {
+  constructor() {
     this.redisClient = createClient({
       url: 'redis://localhost:6379',
     });
-    this.redisClient.on('error', this.handleError);
-    this.redisClient.connect();
+
+    this.redisClient.on('error', (error) => {
+      console.error('Redis error:', error.message);
+    });
   }
 
+  async onModuleInit() {
+    try {
+      await this.redisClient.connect();
+      console.log('Connected to Redis');
+    } catch (error) {
+      console.error('Failed to connect to Redis:', error.message);
+    }
+  }
+
+  async onModuleDestroy() {
+    await this.redisClient.quit();
+    console.log('Redis connection closed');
+  }
+
+  getClient(): RedisClientType {
+    return this.redisClient;
+  }
   async get(key: string): Promise<string | null> {
     return this.redisClient.get(key);
   }
