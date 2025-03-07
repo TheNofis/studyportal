@@ -48,18 +48,26 @@ export class AuthService {
   async register(dto: RegisterAuthDto, session: ISession): Promise<IResponse> {
     this.responseService.start();
 
+    const user: Nullable<User> = await this.prismaService.user.findFirst({
+      where: {
+        username: dto.identifier,
+      },
+    });
+
+    if (user !== null) return this.responseService.error('User already exists');
+
     const hashedPassword: string = await this.passwordService.hashPassword(
       dto.password,
     );
 
-    const user: User = await this.prismaService.user.create({
+    const createdUser: User = await this.prismaService.user.create({
       data: {
         username: dto.identifier,
         password: hashedPassword,
       },
     });
 
-    session.user = user;
+    session.user = createdUser;
 
     return this.responseService.success();
   }
