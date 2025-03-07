@@ -33,10 +33,10 @@ model Assignment {
   id            String              @id @default(cuid())
   title         String
   description   String
-  content       String
-  attachments   Json
+  content       String?
+  attachments   Json?
   module        String
-  tags          String
+  tags          String[]
   deadlineAt    DateTime
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
