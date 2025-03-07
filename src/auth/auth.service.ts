@@ -18,9 +18,7 @@ export class AuthService {
     private readonly responseService: ResponseService,
     private readonly prismaService: PrismaService,
     private readonly passwordService: PasswordService,
-  ) {
-    this.responseService = new ResponseService();
-  }
+  ) {}
 
   async login(dto: LoginAuthDto, session: ISession): Promise<IResponse> {
     this.responseService.start();
