@@ -1,5 +1,5 @@
 interface IStatus {
-  content?: object | string;
+  content?: object | string | null;
   error?: Error | string;
 }
 
