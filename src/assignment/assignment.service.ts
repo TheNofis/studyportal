@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 import { UpdateAssignmentDto } from './dto/update-assignment.dto';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
-import ResponseService from 'src/common/response/response.service';
+import ResponseService, {
+  IResponse,
+} from 'src/common/response/response.service';
+import { Assignment, Assignments_User } from '@prisma/client';
+import { Nullable } from 'src/common/interfaces/nullable.interface';
 
 @Injectable()
 export class AssignmentService {
@@ -11,72 +15,78 @@ export class AssignmentService {
     private readonly responseService: ResponseService,
   ) {}
 
-  async create(createAssignmentDto: CreateAssignmentDto) {
+  async create(dto: CreateAssignmentDto): Promise<IResponse> {
     this.responseService.start();
 
-    await this.prismaService.assignment.create({
+    const assignment: Assignment = await this.prismaService.assignment.create({
       data: {
-        title: createAssignmentDto.title,
-        description: createAssignmentDto.description,
-        content: createAssignmentDto.content,
-        module: createAssignmentDto.module,
-        tags: createAssignmentDto.tags,
-        deadlineAt: createAssignmentDto.deadlineAt,
+        title: dto.title,
+        description: dto.description,
+        content: dto.content,
+        module: dto.module,
+        attachments: dto.attachments ? JSON.stringify(dto.attachments) : '[]',
+        tags: dto.tags || [],
+        deadlineAt: dto.deadlineAt,
       },
     });
 
-    return this.responseService.success();
+    return this.responseService.success({
+      ...assignment,
+      attachments: JSON.parse(assignment.attachments || '[]'),
+    });
   }
 
-  async findAllForUser(userId: string) {
+  async findAllForUser(userId: string): Promise<IResponse> {
     this.responseService.start();
 
     const assignments = await this.prismaService.assignments_User.findMany({
-      where: {
-        userId,
-      },
+      where: { userId },
     });
 
-    this.responseService.success(assignments);
+    return this.responseService.success(assignments);
   }
 
-  async findOneForUser(assignmentsId: string, userId: string) {
+  async findOneForUser(
+    assignmentsId: string,
+    userId: string,
+  ): Promise<IResponse> {
     this.responseService.start();
 
-    const assignment = await this.prismaService.assignments_User.findFirst({
-      where: {
-        assignmentsId,
-        userId
+    const assignment: Nullable<Assignments_User> =
+      await this.prismaService.assignments_User.findFirst({
+        where: {
+          assignmentsId,
+          userId,
+        },
+      });
+
+    return this.responseService.success(assignment);
+  }
+
+  async update(id: string, dto: UpdateAssignmentDto): Promise<IResponse> {
+    this.responseService.start();
+
+    const updatedAssignment = await this.prismaService.assignment.update({
+      where: { id },
+      data: {
+        ...dto,
+        attachments: dto.attachments ? JSON.stringify(dto.attachments) : '[]',
       },
     });
 
-    this.responseService.success(assignment);
+    return this.responseService.success({
+      ...updatedAssignment,
+      attachments: JSON.parse(updatedAssignment.attachments || '[]'),
+    });
   }
 
-  update(id: string, updateAssignmentDto: UpdateAssignmentDto) {
-    this.responseService.start()
-
-    const updatedAssignment = this.prismaService.assignment.update({
-      where: {
-        id
-      },
-      data: {
-        ...updateAssignmentDto
-      }
-    })
-
-    return this.responseService.success(updatedAssignment)
-  }
-
-  async delete(id: string) {
-    this.responseService.start()
+  async delete(id: string): Promise<IResponse> {
+    this.responseService.start();
 
     await this.prismaService.assignment.delete({
-      where: {
-        id
-      }
-    })
+      where: { id },
+    });
 
-    this.responseService.success()
+    return this.responseService.success();
   }
 }

@@ -1,5 +1,11 @@
 import { Transform } from 'class-transformer';
-import { IsDate, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsDate, IsOptional, IsString } from 'class-validator';
+
+export interface IAttachment {
+  title: string;
+  description: string;
+  url: string;
+}
 
 export class CreateAssignmentDto {
   @IsString()
@@ -13,6 +19,9 @@ export class CreateAssignmentDto {
 
   @IsString()
   module: string;
+
+  @IsArray()
+  attachments: IAttachment[];
 
   @IsString({ each: true })
   @IsOptional()

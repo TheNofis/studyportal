@@ -1,7 +1,13 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateAssignmentDto } from './create-assignment.dto';
-import { IsDate, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsDate, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
+
+export interface IAttachment {
+  title: string;
+  description: string;
+  url: string;
+}
 
 export class UpdateAssignmentDto extends PartialType(CreateAssignmentDto) {
   @IsString()
@@ -19,6 +25,9 @@ export class UpdateAssignmentDto extends PartialType(CreateAssignmentDto) {
   @IsString()
   @IsOptional()
   module?: string;
+
+  @IsArray()
+  attachments: IAttachment[];
 
   @IsString({ each: true })
   @IsOptional()

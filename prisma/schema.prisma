@@ -34,7 +34,7 @@ model Assignment {
   title         String
   description   String
   content       String?
-  attachments   Json?
+  attachments   String?
   module        String
   tags          String[]
   deadlineAt    DateTime
