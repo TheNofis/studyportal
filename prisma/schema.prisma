@@ -18,13 +18,19 @@ enum Role {
   user
 }
 
+enum Status {
+  pending
+  approved
+  rejected
+}
+
 model User {
   id            String              @id @default(cuid())
   username      String
   password      String
   class         String              @default("none")
   role          Role                @default(user)
-  assignments   Assignments_User[]
+  assignments   Assignment_User[]
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
 }
@@ -42,19 +48,19 @@ model Assignment {
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
 
-  users         Assignments_User[]
+  users         Assignment_User[]
 }
 
-model Assignments_User {
-  assignmentsId String
-  assignment    Assignment          @relation(fields: [assignmentsId], references: [id])
+model Assignment_User {
+  assignmentId  String
+  assignment    Assignment          @relation(fields: [assignmentId], references: [id])
 
   userId        String
   user          User                @relation(fields: [userId], references: [id])
 
   evaluation    Int
-  status        String
-  comment       String
+  status        Status              @default(pending)
+  comment       String?
   
-  @@id([assignmentsId, userId])
+  @@id([assignmentId, userId])
 }

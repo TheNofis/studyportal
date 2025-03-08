@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Assignment, Assignments_User, User } from '@prisma/client';
+import { Assignment, Assignment_User, User } from '@prisma/client';
 import { Nullable } from 'src/common/interfaces/nullable.interface';
 import { ISession } from 'src/common/interfaces/session.interface';
 import ResponseService from 'src/common/response/response.service';
@@ -41,7 +41,7 @@ export class UserService {
       await this.redisService.getCachedData(
         `last_action:${session.user.id}`,
         async () => {
-          return await this.prismaService.assignments_User.findMany({
+          return await this.prismaService.assignment_User.findMany({
             where: {
               userId: session.user.id,
             },
