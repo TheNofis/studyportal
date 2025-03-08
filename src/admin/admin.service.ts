@@ -5,7 +5,8 @@ import ResponseService, {
   IResponse,
 } from 'src/common/response/response.service';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
-import { Role, User } from '@prisma/client';
+import { Assignment, Assignment_User, Role, User } from '@prisma/client';
+import { Nullable } from 'src/common/interfaces/nullable.interface';
 
 @Injectable()
 export class AdminService {
@@ -14,65 +15,63 @@ export class AdminService {
     private readonly responseService: ResponseService,
   ) {}
 
-  async create(
+  async createAssignmentForUser(
     assignmentId: string,
     userId: string,
     dto: CreateAdminDto,
   ): Promise<IResponse> {
     this.responseService.start();
 
-    const assignmentUser = await this.prismaService.assignment_User.create({
-      data: {
-        assignmentId,
-        userId,
-        evaluation: dto.evaluation,
-        status: dto.status,
-        comment: dto.comment,
-      },
-    });
+    const assignmentUser: Assignment_User =
+      await this.prismaService.assignment_User.create({
+        data: {
+          assignmentId,
+          userId,
+          evaluation: dto.evaluation,
+          status: dto.status,
+          comment: dto.comment,
+        },
+      });
 
     return this.responseService.success(assignmentUser);
   }
 
-  async update(
+  async updateAssignmentForUser(
     assignmentId: string,
     userId: string,
     dto: UpdateAdminDto,
   ): Promise<IResponse> {
     this.responseService.start();
 
-    const assignmentUser = await this.prismaService.assignment_User.update({
-      where: {
-        assignmentId_userId: {
-          assignmentId,
-          userId,
+    const assignmentUser: Assignment_User =
+      await this.prismaService.assignment_User.update({
+        where: {
+          assignmentId_userId: {
+            assignmentId,
+            userId,
+          },
         },
-      },
-      data: {
-        evaluation: dto.evaluation,
-        status: dto.status,
-        comment: dto.comment,
-      },
-    });
+        data: {
+          evaluation: dto.evaluation,
+          status: dto.status,
+          comment: dto.comment,
+        },
+      });
 
     return this.responseService.success(assignmentUser);
   }
 
   // TODO: change the ROLE
-  async getAllStudents(): Promise<IResponse> {
+  async getStudents(): Promise<IResponse> {
     this.responseService.start();
 
     const students = (
       await this.prismaService.user.findMany({
-        where: {
-          role: Role.admin,
-        },
+        where: { role: Role.admin },
         include: { assignments: { select: { evaluation: true } } },
       })
-    ).map((student) => {
-      const { password, assignments, ...newStudent } = student as User & {
-        assignments: { evaluation: number }[];
-      };
+    ).map((student: User & { assignments: Assignment_User[] }) => {
+      const { password, assignments, ...newStudent } = student;
 
       return {
         ...newStudent,
@@ -86,15 +85,17 @@ export class AdminService {
     return this.responseService.success(students);
   }
 
-  async findAssignmentWithUsers(id: string): Promise<IResponse> {
+  async getAssignmentForUser(id: string): Promise<IResponse> {
     this.responseService.start();
 
-    const assignmentWithUsers = await this.prismaService.assignment.findUnique({
+    const assignmentWithUsers: Nullable<
+      Assignment & { users: Assignment_User[] }
+    > = await this.prismaService.assignment.findUnique({
       where: { id },
       include: { users: true },
     });
 
-    return this.responseService.success(assignmentWithUsers);
+    return this.responseService.success(assignmentWithUsers || []);
   }
 
   remove(id: number) {

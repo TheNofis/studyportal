@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseGuards,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
@@ -26,7 +25,7 @@ export class AdminController {
     @Param('userId') userId: string,
     @Body() dto: CreateAdminDto,
   ) {
-    return this.adminService.create(id, userId, dto);
+    return this.adminService.createAssignmentForUser(id, userId, dto);
   }
 
   @Patch('assignment/:id/:userId')
@@ -36,18 +35,18 @@ export class AdminController {
     @Param('userId') userId: string,
     @Body() dto: UpdateAdminDto,
   ) {
-    return this.adminService.update(id, userId, dto);
+    return this.adminService.updateAssignmentForUser(id, userId, dto);
   }
 
   @Get('assignment/:id')
   @Roles(Role.ADMIN)
-  findAssignmentWithUsers(@Param('id') id: string) {
-    return this.adminService.findAssignmentWithUsers(id);
+  getAssignmentForUser(@Param('id') id: string) {
+    return this.adminService.getAssignmentForUser(id);
   }
 
   @Get('students')
   @Roles(Role.ADMIN)
-  findAllStudents() {
-    return this.adminService.getAllStudents();
+  getStudents() {
+    return this.adminService.getStudents();
   }
 }
