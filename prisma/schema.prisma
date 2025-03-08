@@ -36,6 +36,7 @@ model Assignment {
   content       String?
   attachments   String?
   module        String
+  class         String              @default("none")
   tags          String[]
   deadlineAt    DateTime
   createdAt     DateTime            @default(now())
