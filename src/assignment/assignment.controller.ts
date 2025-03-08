@@ -30,17 +30,34 @@ export class AssignmentController {
     return this.assignmentService.create(createAssignmentDto);
   }
 
-  @Get('list')
+  @Get('/user')
   @Roles(Role.USER, Role.ADMIN)
   findAllForUser(@Session() session: ISession) {
     return this.assignmentService.findAllForUser(session.user.id);
   }
 
-  
+  @Get('/user/:id')
+  @Roles(Role.USER, Role.ADMIN)
+  findOneForUser(
+    @Param('id') assignmentsId: string,
+    @Session() session: ISession,
+  ) {
+    return this.assignmentService.findOneForUser(
+      assignmentsId,
+      session.user.id,
+    );
+  }
+
+  @Get('')
+  @Roles(Role.USER, Role.ADMIN)
+  findAll(@Session() session: ISession) {
+    return this.assignmentService.findAll(session.user.class);
+  }
+
   @Get(':id')
   @Roles(Role.USER, Role.ADMIN)
-  findOneForUser(@Param('id') assignmentsId: string, @Session() session: ISession) {
-    return this.assignmentService.findOneForUser(assignmentsId, session.user.id);
+  findOne(@Param('id') id: string) {
+    return this.assignmentService.findOne(id);
   }
 
   @Patch(':id')

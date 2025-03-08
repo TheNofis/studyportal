@@ -36,12 +36,46 @@ export class AssignmentService {
     });
   }
 
+  async findAll(className: string): Promise<IResponse> {
+    this.responseService.start();
+
+    const assignments: Assignment[] = (
+      await this.prismaService.assignment.findMany({
+        where: { class: className },
+      })
+    ).map((assignment: Assignment) => ({
+      ...assignment,
+      attachments: JSON.parse(assignment.attachments || '[]'),
+    }));
+
+    return this.responseService.success(assignments);
+  }
+
+  async findOne(id: string): Promise<IResponse> {
+    this.responseService.start();
+
+    const assignment: Nullable<Assignment> =
+      await this.prismaService.assignment.findFirst({
+        where: {
+          id,
+        },
+      });
+
+    if (assignment === null) return this.responseService.success([]);
+
+    return this.responseService.success({
+      ...assignment,
+      attachments: JSON.parse(assignment.attachments || '[]'),
+    });
+  }
+
   async findAllForUser(userId: string): Promise<IResponse> {
     this.responseService.start();
 
-    const assignments = await this.prismaService.assignments_User.findMany({
-      where: { userId },
-    });
+    const assignments: Assignments_User[] =
+      await this.prismaService.assignments_User.findMany({
+        where: { userId },
+      });
 
     return this.responseService.success(assignments);
   }
