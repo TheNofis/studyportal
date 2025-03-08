@@ -5,7 +5,7 @@ import { PrismaService } from 'src/databases/prisma/prisma.service';
 import ResponseService, {
   IResponse,
 } from 'src/common/response/response.service';
-import { Assignment, Assignments_User } from '@prisma/client';
+import { Assignment, Assignment_User } from '@prisma/client';
 import { Nullable } from 'src/common/interfaces/nullable.interface';
 
 @Injectable()
@@ -72,8 +72,8 @@ export class AssignmentService {
   async findAllForUser(userId: string): Promise<IResponse> {
     this.responseService.start();
 
-    const assignments: Assignments_User[] =
-      await this.prismaService.assignments_User.findMany({
+    const assignments: Assignment_User[] =
+      await this.prismaService.assignment_User.findMany({
         where: { userId },
       });
 
@@ -81,15 +81,15 @@ export class AssignmentService {
   }
 
   async findOneForUser(
-    assignmentsId: string,
+    assignmentId: string,
     userId: string,
   ): Promise<IResponse> {
     this.responseService.start();
 
-    const assignment: Nullable<Assignments_User> =
-      await this.prismaService.assignments_User.findFirst({
+    const assignment: Nullable<Assignment_User> =
+      await this.prismaService.assignment_User.findFirst({
         where: {
-          assignmentsId,
+          assignmentId,
           userId,
         },
       });
