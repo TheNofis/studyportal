@@ -23,6 +23,9 @@ export class AuthService {
   async login(dto: LoginAuthDto, session: ISession): Promise<IResponse> {
     this.responseService.start();
 
+    if (session.user)
+      return this.responseService.error('User already logged in');
+
     const user: Nullable<User> = await this.prismaService.user.findFirst({
       where: {
         username: dto.identifier,
