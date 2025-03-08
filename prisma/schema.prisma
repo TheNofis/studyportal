@@ -63,4 +63,5 @@ model Assignment_User {
   comment       String?
   
   @@id([assignmentId, userId])
+	@@map("Assignments_User")
 }
