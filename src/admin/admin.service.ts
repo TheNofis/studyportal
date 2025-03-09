@@ -61,7 +61,6 @@ export class AdminService {
     return this.responseService.success(assignmentUser);
   }
 
-  // TODO: change the ROLE
   async getStudents(): Promise<IResponse> {
     this.responseService.start();
 
@@ -85,6 +84,21 @@ export class AdminService {
     return this.responseService.success(students);
   }
 
+  async getAssignments(): Promise<IResponse> {
+    this.responseService.start();
+
+    const assignments = (
+      await this.prismaService.assignment.findMany({
+        include: { users: true },
+      })
+    ).map((assignment: Assignment) => ({
+      ...assignment,
+      attachments: JSON.parse(assignment.attachments || '[]'),
+    }));
+
+    return this.responseService.success(assignments);
+  }
+
   async getAssignmentForUser(id: string): Promise<IResponse> {
     this.responseService.start();
 
@@ -96,6 +110,36 @@ export class AdminService {
     });
 
     return this.responseService.success(assignmentWithUsers || []);
+  }
+
+  async getInformation(): Promise<IResponse> {
+    this.responseService.start();
+
+    const [
+      students,
+      activeAssignments,
+      pendingAssignments,
+      approvedAssignments,
+    ] = await Promise.all([
+      this.prismaService.user.count({ where: { role: Role.admin } }),
+      this.prismaService.assignment.count({
+        where: { deadlineAt: { gte: new Date() } },
+      }),
+      this.prismaService.assignment_User.count({
+        where: { status: 'pending' },
+      }),
+      this.prismaService.assignment_User.count({
+        where: { status: 'approved' },
+      }),
+    ]);
+    const information = {
+      students,
+      activeAssignments,
+      pendingAssignments,
+      approvedAssignments,
+    };
+
+    return this.responseService.success(information);
   }
 
   remove(id: number) {

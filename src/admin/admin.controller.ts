@@ -44,6 +44,19 @@ export class AdminController {
     return this.adminService.getAssignmentForUser(id);
   }
 
+  @Get('assignments')
+  @Roles(Role.ADMIN)
+  getAssignments() {
+    return this.adminService.getAssignments();
+  }
+
+  @Get('information')
+  @Roles(Role.ADMIN)
+  getInformation() {
+    return this.adminService.getInformation();
+  }
+
+
   @Get('students')
   @Roles(Role.ADMIN)
   getStudents() {
