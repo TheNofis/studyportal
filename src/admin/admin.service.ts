@@ -5,7 +5,13 @@ import ResponseService, {
   IResponse,
 } from 'src/common/response/response.service';
 import { PrismaService } from 'src/databases/prisma/prisma.service';
-import { Assignment, Assignment_User, Role, User } from '@prisma/client';
+import {
+  Assignment,
+  Assignment_User,
+  Role,
+  Status,
+  User,
+} from '@prisma/client';
 import { Nullable } from 'src/common/interfaces/nullable.interface';
 
 @Injectable()
@@ -88,9 +94,7 @@ export class AdminService {
     this.responseService.start();
 
     const assignments = (
-      await this.prismaService.assignment.findMany({
-        include: { users: true },
-      })
+      await this.prismaService.assignment.findMany({ include: { users: true } })
     ).map((assignment: Assignment) => ({
       ...assignment,
       attachments: JSON.parse(assignment.attachments || '[]'),
@@ -120,18 +124,19 @@ export class AdminService {
       activeAssignments,
       pendingAssignments,
       approvedAssignments,
-    ] = await Promise.all([
+    ]: number[] = await Promise.all([
       this.prismaService.user.count({ where: { role: Role.admin } }),
       this.prismaService.assignment.count({
         where: { deadlineAt: { gte: new Date() } },
       }),
       this.prismaService.assignment_User.count({
-        where: { status: 'pending' },
+        where: { status: Status.pending },
       }),
       this.prismaService.assignment_User.count({
-        where: { status: 'approved' },
+        where: { status: Status.approved },
       }),
     ]);
+
     const information = {
       students,
       activeAssignments,
@@ -140,9 +145,5 @@ export class AdminService {
     };
 
     return this.responseService.success(information);
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} admin`;
   }
 }
