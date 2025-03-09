@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateAdminDto } from './create-admin.dto';
-import { IsNumber, IsString, Max, MaxLength, Min } from 'class-validator';
+import { IsNumber, IsString, Max, Min } from 'class-validator';
 import { Status } from '@prisma/client';
 
 export class UpdateAdminDto extends PartialType(CreateAdminDto) {
@@ -10,7 +10,7 @@ export class UpdateAdminDto extends PartialType(CreateAdminDto) {
   evaluation: number;
 
   @IsString()
-  status?: Status;
+  status: Status;
 
   @IsString()
   comment?: string;
